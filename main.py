@@ -1,8 +1,17 @@
-import requests, uuid, json
+import requests
+import uuid
+import json
+import os
+from dotenv import load_dotenv
+from docx import Document
+from docx.oxml.ns import qn
 
-key = "BuMPtV9wwPkHouEjXvyjdZucMlam3WRRTt6RCiv0Cx2qJc4vSem1JQQJ99BFACi5YpzXJ3w3AAAbACOG8O3T"
+# Cargar las variables de entorno
+load_dotenv()
+
+# Configuración de Azure Translator
+key = os.getenv("AZURE_TRANSLATOR_KEY")
 endpoint = "https://api.cognitive.microsofttranslator.com"
-
 location = "northeurope"
 
 path = "/translate"
@@ -10,8 +19,8 @@ constructed_url = endpoint + path
 
 params = {
     "api-version": "3.0",
-    "from": "en",
-    "to": "es",
+    "from": "es",
+    "to": "en",
 }
 
 headers = {
@@ -22,13 +31,88 @@ headers = {
 }
 
 
-body = [{"text": "I would really like to drive your car around the block a few times!"}]
+# Función para enviar texto a la API de Azure para traducción
+def translate_text(text: str, target_lang: str) -> str:
+    body = [{"text": text}]
+    params["to"] = target_lang  # Establecer el idioma de destino dinámicamente
+    response = requests.post(constructed_url, params=params, headers=headers, json=body)
+    response_json = response.json()
 
-request = requests.post(constructed_url, params=params, headers=headers, json=body)
-response = request.json()
+    # Retornar el texto traducido
+    return response_json[0]["translations"][0]["text"]
 
-print(
-    json.dumps(
-        response, sort_keys=True, ensure_ascii=False, indent=4, separators=(",", ": ")
-    )
-)
+
+# Función para comprobar si un "run" tiene una imagen
+def has_drawing(run) -> bool:
+    return bool(run._element.findall(".//" + qn("w:drawing")))
+
+
+# Función para traducir los párrafos del documento
+def translate_paragraph(paragraph, target_lang: str):
+    full_text = paragraph.text
+    if not full_text.strip():
+        return
+
+    # Traducir el texto del párrafo
+    translated_text = translate_text(full_text, target_lang)
+
+    # Reemplazar el texto traducido en el párrafo, manteniendo el formato
+    written = False
+    for run in paragraph.runs:
+        if run.text.strip() and not has_drawing(run):
+            if not written:
+                run.text = translated_text
+                written = True
+            else:
+                run.text = ""
+
+
+def translate_paragraphs(paragraphs, target_lang: str):
+    for para in paragraphs:
+        translate_paragraph(para, target_lang)
+
+
+def translate_tables(tables, target_lang: str):
+    for table in tables:
+        for row in table.rows:
+            for cell in row.cells:
+                translate_paragraphs(cell.paragraphs, target_lang)
+
+
+def translate_section_parts(section, target_lang: str):
+    parts = [
+        section.header,
+        section.footer,
+        section.first_page_header,
+        section.first_page_footer,
+        section.even_page_header,
+        section.even_page_footer,
+    ]
+    for part in parts:
+        translate_paragraphs(part.paragraphs, target_lang)
+        translate_tables(part.tables, target_lang)
+
+
+# Función para traducir todo el documento
+def translate_docx(input_path: str, output_path: str, target_lang: str):
+    doc = Document(input_path)
+
+    # Traducir todos los párrafos del cuerpo principal del documento
+    translate_paragraphs(doc.paragraphs, target_lang)
+
+    # Traducir las tablas
+    translate_tables(doc.tables, target_lang)
+
+    # Traducir encabezados y pies de página de todas las secciones
+    for section in doc.sections:
+        translate_section_parts(section, target_lang)
+
+    doc.save(output_path)
+
+
+input_path = "document.docx"
+output_path = "translated_document.docx"
+target_lang = "en"
+
+translate_docx(input_path, output_path, target_lang)
+print(f"El documento traducido se ha guardado en: {output_path}")
