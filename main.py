@@ -6,10 +6,8 @@ from dotenv import load_dotenv
 from docx import Document
 from docx.oxml.ns import qn
 
-# Cargar las variables de entorno
 load_dotenv()
 
-# Configuración de Azure Translator
 key = os.getenv("AZURE_TRANSLATOR_KEY")
 endpoint = "https://api.cognitive.microsofttranslator.com"
 location = "northeurope"
