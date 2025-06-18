@@ -45,13 +45,11 @@ def has_drawing(run) -> bool:
     return bool(run._element.findall(".//" + qn("w:drawing")))
 
 
-# Función para traducir los párrafos del documento
 def translate_paragraph(paragraph, target_lang: str):
     full_text = paragraph.text
     if not full_text.strip():
         return
 
-    # Traducir el texto del párrafo
     translated_text = translate_text(full_text, target_lang)
 
     # Reemplazar el texto traducido en el párrafo, manteniendo el formato

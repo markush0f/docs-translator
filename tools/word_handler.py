@@ -5,6 +5,10 @@ import os
 from dotenv import load_dotenv
 from docx import Document
 
+from types_doc import ParamsType
+
+
+
 # Cargar las variables de entorno
 load_dotenv()
 
@@ -16,11 +20,7 @@ location = "northeurope"
 path = "/translate"
 constructed_url = endpoint + path
 
-params = {
-    "api-version": "3.0",
-    "from": "en",  # Idioma de origen
-    "to": "es",  # Idioma de destino
-}
+
 
 headers = {
     "Ocp-Apim-Subscription-Key": key,
@@ -29,31 +29,29 @@ headers = {
     "X-ClientTraceId": str(uuid.uuid4()),
 }
 
-
-# Función para enviar texto a la API de Azure para traducción
-def translate_text(text: str, target_lang: str) -> str:
+def translate_text(text: str, target_lang: str, source_lang: str) -> str:
+    params = {
+        "api-version": "3.0",
+        "from": source_lang,
+        "to": target_lang,
+    }
     body = [{"text": text}]
-    params["to"] = target_lang  # Establecer el idioma de destino dinámicamente
     response = requests.post(constructed_url, params=params, headers=headers, json=body)
     response_json = response.json()
 
-    # Retornar el texto traducido
     return response_json[0]["translations"][0]["text"]
 
 
 # Función para traducir un archivo DOCX
-def translate_docx(input_path: str, output_path: str, target_lang: str):
+def translate_docx(input_path: str, output_path: str, target_lang: str) -> None:
     doc = Document(input_path)
 
-    # Concatenar todo el texto del documento
     full_text = ""
     for para in doc.paragraphs:
         full_text += para.text + "\n"
 
-    # Traducir todo el texto del documento
     translated_text = translate_text(full_text, target_lang)
 
-    # Insertar el texto traducido de vuelta en el documento
     translated_paragraphs = translated_text.split("\n")
     para_index = 0
     for para in doc.paragraphs:
@@ -61,7 +59,6 @@ def translate_docx(input_path: str, output_path: str, target_lang: str):
             para.text = translated_paragraphs[para_index]
             para_index += 1
 
-    # Guardar el documento traducido
     doc.save(output_path)
 
     print(f"Documento traducido guardado como: {output_path}")
