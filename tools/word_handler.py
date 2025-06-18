@@ -8,7 +8,6 @@ from docx import Document
 from types_doc import ParamsType
 
 
-
 # Cargar las variables de entorno
 load_dotenv()
 
@@ -21,13 +20,13 @@ path = "/translate"
 constructed_url = endpoint + path
 
 
-
 headers = {
     "Ocp-Apim-Subscription-Key": key,
     "Ocp-Apim-Subscription-Region": location,
     "Content-type": "application/json",
     "X-ClientTraceId": str(uuid.uuid4()),
 }
+
 
 def translate_text(text: str, target_lang: str, source_lang: str) -> str:
     params = {
@@ -45,12 +44,12 @@ def translate_text(text: str, target_lang: str, source_lang: str) -> str:
 # Función para traducir un archivo DOCX
 def translate_docx(input_path: str, output_path: str, target_lang: str) -> None:
     doc = Document(input_path)
-
+    source_lang = "en"
     full_text = ""
     for para in doc.paragraphs:
         full_text += para.text + "\n"
 
-    translated_text = translate_text(full_text, target_lang)
+    translated_text = translate_text(full_text, target_lang, source_lang)
 
     translated_paragraphs = translated_text.split("\n")
     para_index = 0

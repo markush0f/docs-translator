@@ -52,7 +52,6 @@ def translate_paragraph(paragraph, target_lang: str):
 
     translated_text = translate_text(full_text, target_lang)
 
-    # Reemplazar el texto traducido en el párrafo, manteniendo el formato
     written = False
     for run in paragraph.runs:
         if run.text.strip() and not has_drawing(run):
