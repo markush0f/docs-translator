@@ -22,8 +22,9 @@ def get_translator(model: ModelType):
 if __name__ == "__main__":
     model: ModelType = "aws"
     input_path = "document.docx"
+    filename = input_path.rsplit(".", 1)[0]
     target_lang = "en"
-    output_path = f"translated_document_{model}.docx"
+    output_path = f"translated_{filename}_{model}.docx"
     source_lang = "es"
 
     translate_func = get_translator(model)
