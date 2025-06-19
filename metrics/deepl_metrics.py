@@ -1,5 +1,5 @@
 import requests
-from config import DEEPL_API_KEY
+from config.config import DEEPL_API_KEY
 
 response = requests.post(
     "https://api-free.deepl.com/v2/usage",

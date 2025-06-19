@@ -1,10 +1,11 @@
-from processor import translate_docx
+from tools.processor import translate_docx
 from models.azure_translator import translate_text as azure_translate
 from models.deepl_translator import translate_text as deepl_translate
 from models.aws_translator import translate_text as aws_translate
 from typing import Literal
 
 ModelType = Literal["azure", "deepl", "aws"]
+
 
 def get_translator(model: ModelType):
     translators = {

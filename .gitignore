@@ -2,4 +2,4 @@
 .env
 *.docx
 /extracted_images
-/models
+lid.176.bin
