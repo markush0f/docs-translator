@@ -48,13 +48,13 @@ DEEPL_API_KEY=TU_API_KEY
 ### Paso 2: Ejecutar desde consola
 
 ```bash
-python translate.py <ruta_archivo> <idioma_destino> [--source_lang es] [--model aws|azure|deepl]
+python translate.py <ruta_archivo> --target_lang en --source_lang es --model aws|azure|deepl
 ```
 
 ### Ejemplo:
 
 ```bash
-python translate.py document.pdf en --model deepl --source_lang es
+python translate.py document.pdf --target_lang en --source_lang es --model deepl
 ```
 
 Este ejemplo:
@@ -75,11 +75,12 @@ Este ejemplo:
 * `azure`: Microsoft Azure Translator
 * `deepl`: DeepL Translator
 
-### Idiomas (`<idioma_destino>` y `--source_lang`)
+### Idiomas (`--target_lang` y `--source_lang`)
 
 * Usa códigos estándar ISO 639-1 (ej: `en`, `es`, `fr`, `de`, `pt`, etc.)
 * DeepL requiere dialecto en destino: `EN-US`, `EN-GB`, `PT-PT`, `PT-BR`, etc.
 * Si usas `--source_lang auto`, se activará la detección automática (usa fastText)
+
 
 
 ---
