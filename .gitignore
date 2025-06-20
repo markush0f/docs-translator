@@ -3,3 +3,5 @@
 *.docx
 /extracted_images
 lid.176.bin
+/logs
+logs.txt

@@ -1,2 +1,0 @@
-[2025-06-19 14:34:20] [INFO] [Processor] - Iniciando traducción de: document.docx
-[2025-06-19 14:35:02] [INFO] [Processor] - Documento traducido guardado en: translated_document_aws.docx

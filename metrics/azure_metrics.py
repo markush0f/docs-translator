@@ -1,11 +1,16 @@
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.monitor import MonitorManagementClient
 from dotenv import load_dotenv
 from datetime import timedelta
 from typing import Any
 import os
-
 from config.logger_config import setup_logger
+
+
 logger = setup_logger("AzureMetrics")
 
 load_dotenv()
@@ -26,8 +31,11 @@ if not resource_id:
 from_time = "2025-06-01T00:00:00Z"
 to_time = "2025-06-18T23:59:59Z"
 
+
 def get_metrics(resource_id, from_time: str, to_time: str) -> Any:
-    logger.debug(f"Consultando métricas desde {from_time} hasta {to_time} para {resource_id}")
+    logger.debug(
+        f"Consultando métricas desde {from_time} hasta {to_time} para {resource_id}"
+    )
     try:
         metrics = client.metrics.list(
             resource_id,
@@ -41,6 +49,7 @@ def get_metrics(resource_id, from_time: str, to_time: str) -> Any:
         logger.error(f"Error al obtener métricas de Azure: {e}")
         raise
 
+
 def count_total_characters_translated():
     logger.info("Iniciando conteo de caracteres traducidos desde Azure Monitor.")
     total_characters = 0
@@ -50,11 +59,11 @@ def count_total_characters_translated():
         logger.debug(f"Métrica: {metric.name.localized_value}")
         for timeserie in metric.timeseries:
             for data in timeserie.data:
-                logger.debug(
-                    f"Timestamp: {data.time_stamp}, Total: {data.total}"
-                )
+                logger.debug(f"Timestamp: {data.time_stamp}, Total: {data.total}")
                 if data.total is not None:
                     total_characters += data.total
 
     logger.info(f"Total de caracteres traducidos en el período: {total_characters}")
     return total_characters
+
+count_total_characters_translated()
