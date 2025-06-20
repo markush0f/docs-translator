@@ -45,19 +45,42 @@ AZURE_TRANSLATOR_RESOURCE_ID=/subscriptions/.../resourceGroups/.../providers/...
 DEEPL_API_KEY=TU_API_KEY
 ```
 
-### Paso 2: Usar uno de los traductores en `main.py`
+### Paso 2: Ejecutar desde consola
 
-```python
-from processor import translate_docx
-from models.aws_translator import AWSTranslator
-# from models.azure_translator import AzureTranslator
-# from models.deepl_translator import DeepLTranslator
-
-translator = AWSTranslator()
-translate_docx("document.docx", "translated.docx", "en", "auto", translator.translate_text)
+```bash
+python translate.py <ruta_archivo> <idioma_destino> [--source_lang es] [--model aws|azure|deepl]
 ```
 
-Puedes cambiar `AWSTranslator()` por `AzureTranslator()` o `DeepLTranslator()` según el proveedor que quieras usar. El valor `"auto"` activará la detección automática del idioma fuente con fastText.
+### Ejemplo:
+
+```bash
+python translate.py document.pdf en --model deepl --source_lang es
+```
+
+Este ejemplo:
+
+* Traduce `document.pdf` de español a inglés
+* Usa DeepL como proveedor
+
+> Si el archivo es PDF, lo convierte a `.docx`, lo traduce y luego lo vuelve a guardar como `.pdf` traducido.
+
+### Tipos de entrada soportados
+
+* `.docx`: documento Word editable
+* `.pdf`: cualquier PDF con contenido seleccionable
+
+### Modelos soportados (`--model`)
+
+* `aws`: Amazon Translate
+* `azure`: Microsoft Azure Translator
+* `deepl`: DeepL Translator
+
+### Idiomas (`<idioma_destino>` y `--source_lang`)
+
+* Usa códigos estándar ISO 639-1 (ej: `en`, `es`, `fr`, `de`, `pt`, etc.)
+* DeepL requiere dialecto en destino: `EN-US`, `EN-GB`, `PT-PT`, `PT-BR`, etc.
+* Si usas `--source_lang auto`, se activará la detección automática (usa fastText)
+
 
 ---
 
